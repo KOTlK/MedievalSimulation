@@ -3,6 +3,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
+using static Simulation.Runtime.Entities.GameWorld;
 
 namespace Simulation.Runtime.Entities
 {
@@ -71,9 +72,10 @@ namespace Simulation.Runtime.Entities
             return deposit;
         }
 
-        public static void CreateResourceDeposit(ResourceDeposit deposit, Vector3 position)
+        public static int CreateResourceDeposit(ResourceDeposit deposit, Vector3 position)
         {
             var entity = CreateEntity();
+            ref var cell = ref GetCellReference((int)position.x, (int)position.y);
 
             EntityManager.Entities[entity].Position = position;
 
@@ -86,17 +88,24 @@ namespace Simulation.Runtime.Entities
             
             Resources[ResourcesCount++] = deposit;
             InstantiateCellContentView(CellContent.ResourceDeposit, entity, deposit.Type.ToString());
+
+            cell.ContainsContent = true;
+            cell.ContentEntity = entity;
+            cell.Content = CellContent.ResourceDeposit;
+            
+            return entity;
         }
 
-        public static void CreateRandomResourceDeposit(Vector3 position)
+        public static int CreateRandomResourceDeposit(Vector3 position)
         {
-            CreateResourceDeposit(new ResourceDeposit()
+            return CreateResourceDeposit(new ResourceDeposit()
             {
                 Type = GetRandomDepositType(),
                 ResourcesLeft = Random.Range(MinResourcesCount, MaxResourcesCount)
             }, position);
         }
 
+        //TODO: find cell and remove resource from it
         public static void DestroyResourceDeposit(int index)
         {
             var entity = Resources[index].Entity;

@@ -49,26 +49,37 @@ namespace Simulation.Runtime.Entities
         
         public static void CreateCrop(Crop crop, Vector3 position)
         {
-            var cropEntity = CreateEntity(new Entity()
-            {
-                Position = position,
-                Orientation = 0f,
-                Flags = EntityFlags.Tickable
-            });
+            ref var cell = ref GetCellReference((int)position.x, (int)position.y);
+            if (cell.ContainsContent) return;
             
-            crop.Entity = cropEntity;
-            crop.GrowingTime = 0f;
-            crop.TimeSinceLastWatering = 0f;
-            crop.Stage = GrowStage.Seeds;
-
-            if (CropsCount == Crops.Length)
+            
+            if (cell.Type == CellType.Soil)
             {
-                Array.Resize(ref Crops, CropsCount << 1);
+                var cropEntity = CreateEntity(new Entity()
+                {
+                    Position = position,
+                    Orientation = 0f,
+                    Flags = EntityFlags.Tickable
+                });
+            
+                crop.Entity = cropEntity;
+                crop.GrowingTime = 0f;
+                crop.TimeSinceLastWatering = 0f;
+                crop.Stage = GrowStage.Seeds;
+
+                if (CropsCount == Crops.Length)
+                {
+                    Array.Resize(ref Crops, CropsCount << 1);
+                }
+
+                Crops[CropsCount++] = crop;
+                cell.ContainsContent = true;
+                cell.ContentEntity = cropEntity;
+                cell.Content = CellContent.Crops;
+            
+                InstantiateCellContentView(CellContent.Crops, cropEntity, crop.Type.ToString());
             }
 
-            Crops[CropsCount++] = crop;
-            
-            InstantiateCellContentView(CellContent.Crops, cropEntity, crop.Type.ToString());
         }
         
         public static void TickCrops(Crop[] crops, int cropsCount)
@@ -112,6 +123,7 @@ namespace Simulation.Runtime.Entities
             }
         }
 
+        //TODO: find cell and remove content from it
         public static void DestroyCrop(int index)
         {
             var entity = Crops[index].Entity;

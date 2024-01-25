@@ -56,7 +56,7 @@ namespace Simulation.Runtime.View
                     var go = new GameObject();
                     var view = go.AddComponent<CellView>();
                     var spriteRenderer = go.AddComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = GetSprite(GameWorld.GetCell(x, y).Content.ToString());
+                    spriteRenderer.sprite = GetSprite(GameWorld.GetCell(x, y).Type.ToString());
                     view.transform.position = GameWorld.GetCell(x, y).Position;
                     view.SpriteRenderer = spriteRenderer;
                     go.transform.SetParent(_worldParent.transform);
@@ -88,16 +88,12 @@ namespace Simulation.Runtime.View
             view.SwitchStage(crop.Stage);
         }
 
-        public static void InstantiateCellContentView(CellContent contentType, int entity, string name)
+        public static void InstantiateCellContentView(CellContent content, int entity, string name)
         {
-            var path = $"Prefabs/{contentType.ToString()}/{name}";
+            var path = $"Prefabs/{content.ToString()}/{name}";
 
-            switch (contentType)
+            switch (content)
             {
-                case CellContent.Soil:
-                    break;
-                case CellContent.Rock:
-                    break;
                 case CellContent.ResourceDeposit:
                 {
                     var resource = Resources.Load<EntityView>(path);
@@ -128,7 +124,7 @@ namespace Simulation.Runtime.View
                     break;
                 }
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(contentType), contentType, null);
+                    throw new ArgumentOutOfRangeException(nameof(content), content, null);
             }
         }
 

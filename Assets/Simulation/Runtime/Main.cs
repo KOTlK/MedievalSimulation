@@ -32,7 +32,7 @@ namespace Simulation.Runtime
             {
                 var position = Mouse.current.position.ReadValue();
                 var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
-                var cellPosition = new Vector3((int)worldPosition.x, (int)worldPosition.y);
+                var cellPosition = new Vector3(Mathf.RoundToInt(worldPosition.x), Mathf.RoundToInt(worldPosition.y));
                 
                 CreateCrop(new Crop
                 {

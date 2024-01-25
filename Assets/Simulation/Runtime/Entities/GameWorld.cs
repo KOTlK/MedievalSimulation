@@ -10,19 +10,26 @@ namespace Simulation.Runtime.Entities
     public struct Cell
     {
         public Vector3 Position;
+        public CellType Type;
         public CellContent Content;
+        public bool ContainsContent;
+        public int ContentEntity;
         public int Entity;
     }
     
     [Flags]
-    public enum CellContent : ulong
+    public enum CellType : ulong
     {
         Soil            = 1 << 0,
         Rock            = 1 << 1,
-        ResourceDeposit = 1 << 2,
-        SmallWater      = 1 << 3,
-        DeepWater       = 1 << 4,
-        Crops           = 1 << 5,
+        SmallWater      = 1 << 2,
+        DeepWater       = 1 << 3,
+    }
+
+    public enum CellContent
+    {
+        Crops,
+        ResourceDeposit
     }
     
     public struct WorldBounds
@@ -31,7 +38,7 @@ namespace Simulation.Runtime.Entities
         public Vector2 Min;
     }
 
-    public delegate CellContent WorldGeneration(int x, int y);
+    public delegate CellType WorldGeneration(int x, int y);
 
     public static class GameWorld
     {
@@ -53,9 +60,17 @@ namespace Simulation.Runtime.Entities
                 {
                     var entity = CreateEntity();
                     var position = new Vector3(x * CellSize.x, y * CellSize.y, 0);
-                    var content = genFunc(x, y);
+                    var cellType = genFunc(x, y);
 
-                    if (content == CellContent.Rock)
+                    var cell = new Cell()
+                    {
+                        Type = genFunc(x, y),
+                        Entity = entity,
+                        Position = position,
+                        ContainsContent = false
+                    };
+                    
+                    if (cellType == CellType.Rock)
                     {
                         //generate random resource deposit or no
 
@@ -63,15 +78,11 @@ namespace Simulation.Runtime.Entities
 
                         if (rand <= ResourceDepositChance)
                         {
-                            CreateRandomResourceDeposit(position);
+                            cell.ContainsContent = true;
+                            cell.Content = CellContent.ResourceDeposit;
+                            cell.ContentEntity = CreateRandomResourceDeposit(position);
                         }
                     }
-                    var cell = new Cell()
-                    {
-                        Content = genFunc(x, y),
-                        Entity = entity,
-                        Position = position
-                    };
 
                     SetCell(x, y, cell);
                     EntityManager.Entities[entity].Position = position;
@@ -86,21 +97,22 @@ namespace Simulation.Runtime.Entities
             };
         }
 
-        public static CellContent PerlinNoise(int x, int y)
+        public static CellType PerlinNoise(int x, int y)
         {
             var rand = Mathf.PerlinNoise(x * 0.1f + WorldSeed, y * 0.1f + WorldSeed);
 
             if (rand >= 0.6f)
             {
-                return CellContent.Rock;
+                return CellType.Rock;
             }
             else
             {
-                return CellContent.Soil;
+                return CellType.Soil;
             }
         }
 
         public static Cell GetCell(int x, int y) => Cells[x + y * Size.x];
+        public static ref Cell GetCellReference(int x, int y) => ref Cells[x + y * Size.x];
         public static void SetCell(int x, int y, Cell cell) => Cells[x + y * Size.x] = cell;
     }
 }
