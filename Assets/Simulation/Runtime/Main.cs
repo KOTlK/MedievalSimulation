@@ -2,7 +2,7 @@ using Simulation.Runtime.Entities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
-using static Simulation.Runtime.Entities.WorldUtils;
+using static Simulation.Runtime.Entities.GameWorld;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Farming;
 
@@ -10,20 +10,19 @@ namespace Simulation.Runtime
 {
     public class Main : MonoBehaviour
     {
-        public int FarmsCount;
         public int FarmersCount;
         public Vector2Int WorldSize;
         
         private void Start()
         {
-            FillMap(FarmsCount);
+            FillMap();
             SpawnFarmers(FarmersCount);
             PlayerInput.Input.EnableGameplayScheme();
         }
 
         private void Update()
         {
-            TickCrops(WorldUtils.World.Crops, WorldUtils.World.CropsCount);
+            TickCrops(Crops, CropsCount);
             DrawFarmers(EntityManager.Farmers, EntityManager.FarmersCount);
 
             if (Mouse.current.leftButton.wasReleasedThisFrame)
@@ -32,7 +31,7 @@ namespace Simulation.Runtime
                 var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
                 var cellPosition = new Vector3((int)worldPosition.x, (int)worldPosition.y);
                 
-                CreateCrop(ref WorldUtils.World, new Crop
+                CreateCrop(new Crop
                 {
                     CropsPerHarvest = 10,
                     TimeToGrow = 15f,
@@ -57,10 +56,10 @@ namespace Simulation.Runtime
             }
         }
 
-        private void FillMap(int farmsCount)
+        private void FillMap()
         {
             CreateWorld(WorldSize, PerlinNoise);
-            DrawWorldFirst(ref WorldUtils.World);
+            DrawWorldFirst();
         }
     }
 }

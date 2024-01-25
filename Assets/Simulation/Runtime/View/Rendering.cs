@@ -40,38 +40,32 @@ namespace Simulation.Runtime.View
             AddView(entity, Object.Instantiate(resource, position, Quaternion.identity));
         }
 
-        public static void RebindView(int entity, int newEntity)
-        {
-            _viewsDense[newEntity] = _viewsDense[entity];
-            _viewsDense[entity] = null;
-        }
-
         public static void DestroyView(int entity)
         {
             Object.Destroy(_viewsDense[entity].gameObject);
             _viewsDense[entity] = null;
         }
 
-        public static void DrawWorldFirst(ref World world)
+        public static void DrawWorldFirst()
         {
             _worldParent = new GameObject();
-            for (var y = 0; y < world.Size.y; ++y)
+            for (var y = 0; y < GameWorld.Size.y; ++y)
             {
-                for (var x = 0; x < world.Size.x; ++x)
+                for (var x = 0; x < GameWorld.Size.x; ++x)
                 {
                     var go = new GameObject();
                     var view = go.AddComponent<CellView>();
                     var spriteRenderer = go.AddComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = GetSprite(world[x, y].Content.ToString());
-                    view.transform.position = world[x, y].Position;
+                    spriteRenderer.sprite = GetSprite(GameWorld.GetCell(x, y).Content.ToString());
+                    view.transform.position = GameWorld.GetCell(x, y).Position;
                     view.SpriteRenderer = spriteRenderer;
                     go.transform.SetParent(_worldParent.transform);
-                    AddView(world[x, y].Entity, view);
+                    AddView(GameWorld.GetCell(x, y).Entity, view);
                 }
             }
         }
 
-        public static void DrawCropFirst(ref Crop crop)
+       /* public static void DrawCropFirst(ref Crop crop)
         {
             var resource = Resources.Load<CropView>($"Prefabs/Crops/{crop.Type.ToString()}");
 
@@ -85,13 +79,57 @@ namespace Simulation.Runtime.View
             }
 
             _cropsDense[crop.Entity] = view;
-        }
+        }*/
 
         public static void DrawCrop(ref Crop crop)
         {
             var view = _cropsDense[crop.Entity];
 
             view.SwitchStage(crop.Stage);
+        }
+
+        public static void InstantiateCellContentView(CellContent contentType, int entity, string name)
+        {
+            var path = $"Prefabs/{contentType.ToString()}/{name}";
+
+            switch (contentType)
+            {
+                case CellContent.Soil:
+                    break;
+                case CellContent.Rock:
+                    break;
+                case CellContent.ResourceDeposit:
+                {
+                    var resource = Resources.Load<EntityView>(path);
+                    var view = Object.Instantiate(resource, EntityManager.Entities[entity].Position,
+                        Quaternion.identity);
+
+                    if (entity >= _cropsDense.Length)
+                    {
+                        Array.Resize(ref _cropsDense, entity << 1);
+                    }
+
+                    AddView(entity, view);
+                    break;
+                }
+                case CellContent.Crops:
+                {
+                    var resource = Resources.Load<CropView>(path);
+                    var view = Object.Instantiate(resource, EntityManager.Entities[entity].Position,
+                        Quaternion.identity);
+
+                    if (entity >= _cropsDense.Length)
+                    {
+                        Array.Resize(ref _cropsDense, entity << 1);
+                    }
+
+                    _cropsDense[entity] = view;
+                    AddView(entity, view);
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(contentType), contentType, null);
+            }
         }
 
         public static void DestroyCrop(int entity)

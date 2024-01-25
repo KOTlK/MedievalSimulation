@@ -3,6 +3,7 @@ using Simulation.Runtime.View;
 using UnityEngine;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
+using static Simulation.Runtime.Entities.GameWorld;
 
 namespace Simulation.Runtime.Entities
 {
@@ -37,7 +38,7 @@ namespace Simulation.Runtime.Entities
     
     public static class Farming
     {
-        public static void CreateCrop(ref World world, Crop crop, Vector3 position)
+        public static void CreateCrop(Crop crop, Vector3 position)
         {
             var cropEntity = CreateEntity(new Entity()
             {
@@ -51,8 +52,14 @@ namespace Simulation.Runtime.Entities
             crop.TimeSinceLastWatering = 0f;
             crop.Stage = GrowStage.Seeds;
 
-            world.Crops[world.CropsCount++] = crop;
-            DrawCropFirst(ref crop);
+            if (CropsCount == Crops.Length)
+            {
+                Array.Resize(ref Crops, CropsCount << 1);
+            }
+
+            Crops[CropsCount++] = crop;
+            
+            InstantiateCellContentView(CellContent.Crops, cropEntity, crop.Type.ToString());
         }
         
         public static void TickCrops(Crop[] crops, int cropsCount)
@@ -96,10 +103,12 @@ namespace Simulation.Runtime.Entities
             }
         }
 
-        public static void DestroyCrop(ref World world, int entity)
+        public static void DestroyCrop(int index)
         {
-            world.Crops[entity] = default;
+            var entity = Crops[index].Entity;
             DeleteEntity(entity);
+            Crops[index] = Crops[--CropsCount];
+            Crops[ResourcesCount] = default;
             Rendering.DestroyCrop(entity);
         }
     }

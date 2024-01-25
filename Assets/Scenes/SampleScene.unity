@@ -484,7 +484,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e459c5fce8d480a4fa2282a6831fea56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FarmsCount: 0
   FarmersCount: 10
   WorldSize: {x: 100, y: 100}
 --- !u!114 &1796036895
