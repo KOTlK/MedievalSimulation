@@ -353,6 +353,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 15
   _fastSpeed: 40
+  _zoomSpeed: 1
   _size: 10
   _z: -10
   _camera: {fileID: 519420031}

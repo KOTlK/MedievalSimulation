@@ -28,8 +28,8 @@ namespace Simulation.Runtime.Camera
             {
                 if (Controls.GamePlay.Zoom.WasPerformedThisFrame())
                 {
-                    _size += Controls.GamePlay.Zoom.ReadValue<float>() * Time.deltaTime * _zoomSpeed;
-                    _size = Mathf.Clamp(_size, 0, 10);
+                    _size -= Controls.GamePlay.Zoom.ReadValue<float>() * Time.deltaTime * _zoomSpeed;
+                    _size = Mathf.Clamp(_size, 1f, 10f);
                     _camera.orthographicSize = _size;
                 }
                 
