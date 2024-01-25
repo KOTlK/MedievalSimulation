@@ -1,11 +1,10 @@
-using System;
 using Simulation.Runtime.Entities;
-using Simulation.Runtime.View;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.WorldUtils;
 using static Simulation.Runtime.View.Rendering;
+using static Simulation.Runtime.Entities.Farming;
 
 namespace Simulation.Runtime
 {
