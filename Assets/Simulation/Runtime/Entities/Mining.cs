@@ -2,7 +2,6 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.EntityManager;
-using static Simulation.Runtime.Entities.GameWorld;
 using static Simulation.Runtime.View.Rendering;
 
 namespace Simulation.Runtime.Entities
@@ -29,6 +28,8 @@ namespace Simulation.Runtime.Entities
     
     public static class Mining
     {
+        public static ResourceDeposit[] Resources;
+        public static int ResourcesCount;
         public static int MinResourcesCount;
         public static int MaxResourcesCount;
         
@@ -45,6 +46,12 @@ namespace Simulation.Runtime.Entities
                 Chance = 1f
             }
         };
+
+        public static void InitializeMining()
+        {
+            Resources = new ResourceDeposit[10];
+            ResourcesCount = 0;
+        }
         
         public static DepositType GetRandomDepositType()
         {
@@ -72,12 +79,12 @@ namespace Simulation.Runtime.Entities
 
             deposit.Entity = entity;
 
-            if (ResourcesCount == GameWorld.Resources.Length)
+            if (ResourcesCount == Resources.Length)
             {
-                Array.Resize(ref GameWorld.Resources, ResourcesCount << 1);
+                Array.Resize(ref Resources, ResourcesCount << 1);
             }
             
-            GameWorld.Resources[ResourcesCount++] = deposit;
+            Resources[ResourcesCount++] = deposit;
             InstantiateCellContentView(CellContent.ResourceDeposit, entity, deposit.Type.ToString());
         }
 
@@ -92,10 +99,10 @@ namespace Simulation.Runtime.Entities
 
         public static void DestroyResourceDeposit(int index)
         {
-            var entity = GameWorld.Resources[index].Entity;
+            var entity = Resources[index].Entity;
             DeleteEntity(entity);
-            GameWorld.Resources[index] = GameWorld.Resources[--ResourcesCount];
-            GameWorld.Resources[ResourcesCount] = default;
+            Resources[index] = Resources[--ResourcesCount];
+            Resources[ResourcesCount] = default;
             DestroyView(entity);
         }
     }

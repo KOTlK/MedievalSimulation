@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.GameWorld;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Farming;
+using static Simulation.Runtime.Entities.Mining;
 
 namespace Simulation.Runtime
 {
@@ -15,6 +16,8 @@ namespace Simulation.Runtime
         
         private void Start()
         {
+            InitializeFarming();
+            InitializeMining();
             FillMap();
             SpawnFarmers(FarmersCount);
             PlayerInput.Input.EnableGameplayScheme();

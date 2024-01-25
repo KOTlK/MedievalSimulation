@@ -38,6 +38,15 @@ namespace Simulation.Runtime.Entities
     
     public static class Farming
     {
+        public static Crop[] Crops;
+        public static int CropsCount;
+
+        public static void InitializeFarming()
+        {
+            Crops = new Crop[10];
+            CropsCount = 0;
+        }
+        
         public static void CreateCrop(Crop crop, Vector3 position)
         {
             var cropEntity = CreateEntity(new Entity()
@@ -108,7 +117,7 @@ namespace Simulation.Runtime.Entities
             var entity = Crops[index].Entity;
             DeleteEntity(entity);
             Crops[index] = Crops[--CropsCount];
-            Crops[ResourcesCount] = default;
+            Crops[CropsCount] = default;
             Rendering.DestroyCrop(entity);
         }
     }

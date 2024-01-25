@@ -37,10 +37,6 @@ namespace Simulation.Runtime.Entities
     {
         public static Vector2Int Size;
         public static Cell[] Cells;
-        public static Crop[] Crops;
-        public static ResourceDeposit[] Resources;
-        public static int CropsCount;
-        public static int ResourcesCount;
         public static WorldBounds Bounds;
         public static Vector2 CellSize = new (1f, 1f);
         public static int WorldSeed = 87645;
@@ -50,10 +46,6 @@ namespace Simulation.Runtime.Entities
         {
             Size = size;
             Cells = new Cell[size.x * size.y];
-            Crops = new Crop[10];
-            Resources = new ResourceDeposit[10];
-            CropsCount = 0;
-            ResourcesCount = 0;
 
             for (var y = 0; y < size.y; ++y)
             {
