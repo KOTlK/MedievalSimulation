@@ -38,14 +38,8 @@ namespace Simulation.Runtime.Entities
     
     public static class Farming
     {
-        public static Crop[] Crops;
-        public static int CropsCount;
-
-        public static void InitializeFarming()
-        {
-            Crops = new Crop[10];
-            CropsCount = 0;
-        }
+        public static Crop[] Crops = new Crop[10];
+        public static int CropsCount = 0;
         
         public static void CreateCrop(Crop crop, Vector3 position)
         {

@@ -29,10 +29,10 @@ namespace Simulation.Runtime.Entities
     
     public static class Mining
     {
-        public static ResourceDeposit[] Resources;
-        public static int ResourcesCount;
-        public static int MinResourcesCount;
-        public static int MaxResourcesCount;
+        public static ResourceDeposit[] Resources = new ResourceDeposit[10];
+        public static int ResourcesCount = 0;
+        public static int MinResourcesCount = 200;
+        public static int MaxResourcesCount = 10000;
         
         //Higher chance goes lower
         public static readonly DepositChances[] DepositChance = {
@@ -47,12 +47,6 @@ namespace Simulation.Runtime.Entities
                 Chance = 1f
             }
         };
-
-        public static void InitializeMining()
-        {
-            Resources = new ResourceDeposit[10];
-            ResourcesCount = 0;
-        }
         
         public static DepositType GetRandomDepositType()
         {

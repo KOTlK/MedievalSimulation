@@ -17,8 +17,6 @@ namespace Simulation.Runtime
         
         private void Start()
         {
-            InitializeFarming();
-            InitializeMining();
             FillMap();
             SpawnFarmers(FarmersCount);
             PlayerInput.Input.EnableGameplayScheme();
