@@ -9,4 +9,9 @@
         /// </summary>
         public bool Sex;
     }
+    
+    public static class Units
+    {
+        
+    }
 }

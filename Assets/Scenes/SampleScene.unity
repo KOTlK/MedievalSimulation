@@ -485,7 +485,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FarmersCount: 10
-  WorldSize: {x: 100, y: 100}
+  WorldSize: {x: 250, y: 250}
 --- !u!114 &1796036895
 MonoBehaviour:
   m_ObjectHideFlags: 0
