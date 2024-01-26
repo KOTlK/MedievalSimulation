@@ -1,5 +1,5 @@
 ﻿using System;
-using Simulation.Runtime.View;
+using System.Collections.Generic;
 using UnityEngine;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
@@ -40,10 +40,12 @@ namespace Simulation.Runtime.Entities
     {
         public static Crop[] Crops = new Crop[10];
         public static int CropsCount = 0;
+
+        private static Dictionary<int, int> _indexByEntity = new();
         
-        public static void CreateCrop(Crop crop, Vector3 position)
+        public static void CreateCrop(Crop crop, Vector3Int position)
         {
-            ref var cell = ref GetCellReference((int)position.x, (int)position.y);
+            ref var cell = ref GetCellReference(position.x, position.y);
             if (cell.ContainsContent) return;
             
             if (cell.Type == CellType.Soil)
@@ -66,11 +68,12 @@ namespace Simulation.Runtime.Entities
                     Array.Resize(ref Crops, CropsCount << 1);
                 }
 
-                Crops[CropsCount++] = crop;
-                cell.ContainsContent = true;
-                cell.ContentEntity = cropEntity;
-                cell.Content = CellContent.Crops;
-            
+                var index = CropsCount++;
+                Crops[index] = crop;
+
+                FillCellContent(position.x, position.y, CellContent.Crops, cropEntity);
+
+                _indexByEntity[cropEntity] = index;
                 InstantiateCellContentView(CellContent.Crops, cropEntity, crop.Type.ToString());
             }
 
@@ -117,14 +120,24 @@ namespace Simulation.Runtime.Entities
             }
         }
 
-        //TODO: find cell and remove content from it
         public static void DestroyCrop(int index)
         {
             var entity = Crops[index].Entity;
-            DeleteEntity(entity);
+            var position = EntityManager.Entities[entity].Position;
+
+
             Crops[index] = Crops[--CropsCount];
             Crops[CropsCount] = default;
-            Rendering.DestroyCrop(entity);
+            RemoveCellContent((int)position.x, (int)position.y);
+            DeleteEntity(entity);
+            FreeCrop(entity);
         }
+
+        public static ref Crop GetCropByEntity(int entity)
+        {
+            return ref Crops[_indexByEntity[entity]];
+        }
+
+        public static int GetCropIdByEntity(int entity) => _indexByEntity[entity];
     }
 }

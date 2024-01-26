@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
@@ -49,6 +50,8 @@ namespace Simulation.Runtime.Entities
         public static int WorldSeed = 87645;
         public static float ResourceDepositChance = 0.02f;
 
+        private static Dictionary<int, int> _indexByEntity = new();
+
         public static void CreateWorld(Vector2Int size, WorldGeneration genFunc )
         {
             Size = size;
@@ -80,7 +83,7 @@ namespace Simulation.Runtime.Entities
                         {
                             cell.ContainsContent = true;
                             cell.Content = CellContent.ResourceDeposit;
-                            cell.ContentEntity = CreateRandomResourceDeposit(position);
+                            cell.ContentEntity = CreateRandomResourceDeposit(new Vector3Int(x, y, 0));
                         }
                     }
 
@@ -112,8 +115,30 @@ namespace Simulation.Runtime.Entities
             }
         }
 
+        public static void FillCellContent(int x, int y, CellContent content, int contentEntity)
+        {
+            Cells[x + y * Size.x].Content = content;
+            Cells[x + y * Size.x].ContainsContent = true;
+            Cells[x + y * Size.x].ContentEntity = contentEntity;
+        }
+
+        public static void RemoveCellContent(int x, int y)
+        {
+            Cells[x + y * Size.x].ContainsContent = false;
+            Cells[x + y * Size.x].ContentEntity = -1;
+        }
+
         public static Cell GetCell(int x, int y) => Cells[x + y * Size.x];
         public static ref Cell GetCellReference(int x, int y) => ref Cells[x + y * Size.x];
-        public static void SetCell(int x, int y, Cell cell) => Cells[x + y * Size.x] = cell;
+        public static void SetCell(int x, int y, Cell cell)
+        {
+            var index = x + y * Size.x;
+
+            _indexByEntity[cell.Entity] = index;
+            Cells[x + y * Size.x] = cell;
+        }
+
+        public static ref Cell GetCellByEntity(int entity) => ref Cells[_indexByEntity[entity]];
+        public static int GetCellIdByEntity(int entity) => _indexByEntity[entity];
     }
 }

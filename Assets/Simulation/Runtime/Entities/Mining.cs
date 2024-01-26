@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.EntityManager;
@@ -34,6 +35,8 @@ namespace Simulation.Runtime.Entities
         public static int MinResourcesCount = 200;
         public static int MaxResourcesCount = 10000;
         
+        private static Dictionary<int, int> _indexByEntity = new();
+        
         //Higher chance goes lower
         public static readonly DepositChances[] DepositChance = {
             new()
@@ -66,10 +69,9 @@ namespace Simulation.Runtime.Entities
             return deposit;
         }
 
-        public static int CreateResourceDeposit(ResourceDeposit deposit, Vector3 position)
+        public static int CreateResourceDeposit(ResourceDeposit deposit, Vector3Int position)
         {
             var entity = CreateEntity();
-            ref var cell = ref GetCellReference((int)position.x, (int)position.y);
 
             EntityManager.Entities[entity].Position = position;
 
@@ -79,18 +81,19 @@ namespace Simulation.Runtime.Entities
             {
                 Array.Resize(ref Resources, ResourcesCount << 1);
             }
-            
-            Resources[ResourcesCount++] = deposit;
+
+            var index = ResourcesCount++;
+            Resources[index] = deposit;
             InstantiateCellContentView(CellContent.ResourceDeposit, entity, deposit.Type.ToString());
 
-            cell.ContainsContent = true;
-            cell.ContentEntity = entity;
-            cell.Content = CellContent.ResourceDeposit;
+            FillCellContent(position.x, position.y, CellContent.ResourceDeposit, entity);
+
+            _indexByEntity[entity] = index;
             
             return entity;
         }
 
-        public static int CreateRandomResourceDeposit(Vector3 position)
+        public static int CreateRandomResourceDeposit(Vector3Int position)
         {
             return CreateResourceDeposit(new ResourceDeposit()
             {
@@ -99,14 +102,23 @@ namespace Simulation.Runtime.Entities
             }, position);
         }
 
-        //TODO: find cell and remove resource from it
         public static void DestroyResourceDeposit(int index)
         {
             var entity = Resources[index].Entity;
-            DeleteEntity(entity);
+            var position = EntityManager.Entities[entity].Position;
+
             Resources[index] = Resources[--ResourcesCount];
             Resources[ResourcesCount] = default;
-            DestroyView(entity);
+            RemoveCellContent((int)position.x, (int)position.y);
+            DeleteEntity(entity);
+            FreeView(entity);
         }
+
+        public static ref ResourceDeposit GetResourceByEntity(int entity)
+        {
+            return ref Resources[_indexByEntity[entity]];
+        }
+        
+        public static int GetResourceIdByEntity(int entity) => _indexByEntity[entity];
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Simulation.Runtime.Entities;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -25,13 +26,13 @@ namespace Simulation.Runtime
         private void Update()
         {
             TickCrops(Crops, CropsCount);
-            DrawFarmers(Farmers, FarmersCount);
+            
 
             if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
                 var position = Mouse.current.position.ReadValue();
                 var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
-                var cellPosition = new Vector3(Mathf.RoundToInt(worldPosition.x), Mathf.RoundToInt(worldPosition.y));
+                var cellPosition = new Vector3Int(Mathf.RoundToInt(worldPosition.x), Mathf.RoundToInt(worldPosition.y));
                 
                 CreateCrop(new Crop
                 {
@@ -42,6 +43,33 @@ namespace Simulation.Runtime
                 },
                     cellPosition);
             }
+
+            if (Mouse.current.rightButton.wasReleasedThisFrame)
+            {
+                var position = Mouse.current.position.ReadValue();
+                var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
+                var cellPosition = new Vector3Int(Mathf.RoundToInt(worldPosition.x), Mathf.RoundToInt(worldPosition.y));
+
+                ref var cell = ref GetCellReference(cellPosition.x, cellPosition.y);
+
+                Debug.Log($"({cellPosition.x.ToString()}, {cellPosition.y.ToString()}), {cell.ContainsContent.ToString()}, {cell.Content.ToString()}, {cell.ContentEntity.ToString()}");
+                if (cell.ContainsContent)
+                {
+                    switch (cell.Content)
+                    {
+                        case CellContent.Crops:
+                            DestroyCrop(GetCropIdByEntity(cell.ContentEntity));
+                            break;
+                        case CellContent.ResourceDeposit:
+                            DestroyResourceDeposit(GetResourceIdByEntity(cell.ContentEntity));
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+            
+            DrawFarmers(Farmers, FarmersCount);
         }
 
         private void SpawnFarmers(int count)

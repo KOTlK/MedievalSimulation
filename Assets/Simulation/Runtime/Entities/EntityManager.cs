@@ -36,6 +36,7 @@ namespace Simulation.Runtime.Entities
             }
 
             Entities[id] = default;
+            Entities[id].Id = id;
             Entities[id].IsAlive = true;
             
             return id;
@@ -47,6 +48,7 @@ namespace Simulation.Runtime.Entities
             Entities[id].Orientation = config.Orientation;
             Entities[id].Position = config.Position;
             Entities[id].Flags = config.Flags;
+            Entities[id].EntityType = config.EntityType;
 
             return id;
         }
@@ -54,13 +56,13 @@ namespace Simulation.Runtime.Entities
         public static void DeleteEntity(int id)
         {
             Entities[id].IsAlive = false;
+            Entities[id].Id = -1;
             EntitiesCount--;
             if (_freeEntitiesCount == _freeEntities.Length)
             {
                 Array.Resize(ref _freeEntities, _freeEntitiesCount << 1);
             }
             _freeEntities[_freeEntitiesCount++] = id;
-            Rendering.DestroyView(id);
         }
     }
 }

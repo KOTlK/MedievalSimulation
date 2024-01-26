@@ -40,10 +40,13 @@ namespace Simulation.Runtime.View
             AddView(entity, Object.Instantiate(resource, position, Quaternion.identity));
         }
 
-        public static void DestroyView(int entity)
+        public static void FreeView(int entity)
         {
-            Object.Destroy(_viewsDense[entity].gameObject);
-            _viewsDense[entity] = null;
+            if (_viewsDense[entity])
+            {
+                Object.Destroy(_viewsDense[entity].gameObject);
+                _viewsDense[entity] = null;
+            }
         }
 
         public static void DrawWorldFirst()
@@ -64,22 +67,6 @@ namespace Simulation.Runtime.View
                 }
             }
         }
-
-       /* public static void DrawCropFirst(ref Crop crop)
-        {
-            var resource = Resources.Load<CropView>($"Prefabs/Crops/{crop.Type.ToString()}");
-
-            var view = Object.Instantiate(resource, EntityManager.Entities[crop.Entity].Position, Quaternion.identity);
-
-            AddView(crop.Entity, view);
-
-            if (crop.Entity >= _cropsDense.Length)
-            {
-                Array.Resize(ref _cropsDense, crop.Entity << 1);
-            }
-
-            _cropsDense[crop.Entity] = view;
-        }*/
 
         public static void DrawCrop(ref Crop crop)
         {
@@ -128,10 +115,10 @@ namespace Simulation.Runtime.View
             }
         }
 
-        public static void DestroyCrop(int entity)
+        public static void FreeCrop(int entity)
         {
             _cropsDense[entity] = null;
-            DestroyView(entity);
+            FreeView(entity);
         }
     }
 }
