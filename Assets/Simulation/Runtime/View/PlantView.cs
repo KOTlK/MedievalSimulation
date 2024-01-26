@@ -4,7 +4,7 @@ using static Simulation.Runtime.View.SpriteCatalog;
 
 namespace Simulation.Runtime.View
 {
-    public class CropView : EntityView
+    public class PlantView : EntityView
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private string _seeds = "Seeds",
@@ -17,7 +17,7 @@ namespace Simulation.Runtime.View
         
         private void Awake()
         {
-            _spriteRenderer.sprite = GetCropSprite(_seeds);
+            _spriteRenderer.sprite = GetPlantSprite(_seeds);
             _currentStage = GrowStage.Seeds;
         }
 
@@ -28,13 +28,13 @@ namespace Simulation.Runtime.View
 
             _spriteRenderer.sprite = stage switch
             {
-                GrowStage.Seeds => GetCropSprite(_seeds),
-                GrowStage.Shoots => GetCropSprite(_shoots),
-                GrowStage.HalfGrown => GetCropSprite(_halfGrown),
-                GrowStage.AlmostGrown => GetCropSprite(_halfGrown),
-                GrowStage.FullyGrown => GetCropSprite(_fullyGrown),
-                GrowStage.Faded => GetCropSprite(_faded),
-                _ => GetCropSprite(_seeds)
+                GrowStage.Seeds => GetPlantSprite(_seeds),
+                GrowStage.Shoots => GetPlantSprite(_shoots),
+                GrowStage.HalfGrown => GetPlantSprite(_halfGrown),
+                GrowStage.AlmostGrown => GetPlantSprite(_halfGrown),
+                GrowStage.FullyGrown => GetPlantSprite(_fullyGrown),
+                GrowStage.Faded => GetPlantSprite(_faded),
+                _ => GetPlantSprite(_seeds)
             };
             
             _currentStage = stage;

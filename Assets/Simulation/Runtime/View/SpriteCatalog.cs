@@ -10,22 +10,22 @@ namespace Simulation.Runtime.View
         [SerializeField] private SpriteReference[] _sprites;
 
         private static readonly Dictionary<string, Sprite> _map = new();
-        private static SpriteAtlas _crops;
+        private static SpriteAtlas _plants;
         
         public static Sprite GetSprite(string spriteName)
         {
             return _map[spriteName];
         }
 
-        public static Sprite GetCropSprite(string name)
+        public static Sprite GetPlantSprite(string name)
         {
-            return _crops.GetSprite(name);
+            return _plants.GetSprite(name);
         }
 
         private void Awake()
         {
             Init();
-            _crops = Resources.Load<SpriteAtlas>("SpriteAtlasses/Crops");
+            _plants = Resources.Load<SpriteAtlas>("SpriteAtlasses/Crops");
         }
 
         private void Init()

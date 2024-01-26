@@ -25,7 +25,7 @@ namespace Simulation.Runtime
 
         private void Update()
         {
-            TickCrops(Crops, CropsCount);
+            TickPlants(Plants, PlantsCount);
             
 
             if (Mouse.current.leftButton.wasReleasedThisFrame)
@@ -34,9 +34,9 @@ namespace Simulation.Runtime
                 var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
                 var cellPosition = new Vector3Int(Mathf.RoundToInt(worldPosition.x), Mathf.RoundToInt(worldPosition.y));
                 
-                CreateCrop(new Crop
+                CreatePlant(new Plant
                 {
-                    CropsPerHarvest = 10,
+                    ResourcesPerHarvest = 10,
                     TimeToGrow = 15f,
                     TimeToDry = 20,
                     Type = CropsType.Wheat
@@ -57,8 +57,8 @@ namespace Simulation.Runtime
                 {
                     switch (cell.Content)
                     {
-                        case CellContent.Crops:
-                            DestroyCrop(GetCropIdByEntity(cell.ContentEntity));
+                        case CellContent.Plants:
+                            DestroyPlant(GetPlantIdByEntity(cell.ContentEntity));
                             break;
                         case CellContent.ResourceDeposit:
                             DestroyResourceDeposit(GetResourceIdByEntity(cell.ContentEntity));

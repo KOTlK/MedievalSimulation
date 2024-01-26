@@ -9,12 +9,12 @@ namespace Simulation.Runtime.Entities
 {
     
     [Serializable]
-    public struct Crop
+    public struct Plant
     {
         public CropsType Type;
         public GrowStage Stage;
         public int Entity;
-        public int CropsPerHarvest;
+        public int ResourcesPerHarvest;
         public float TimeToGrow;
         public float GrowingTime;
         public float TimeSinceLastWatering;
@@ -38,17 +38,16 @@ namespace Simulation.Runtime.Entities
     
     public static class Farming
     {
-        public static Crop[] Crops = new Crop[10];
-        public static int CropsCount = 0;
+        public static Plant[] Plants = new Plant[10];
+        public static int PlantsCount = 0;
 
         private static Dictionary<int, int> _indexByEntity = new();
         
-        public static void CreateCrop(Crop crop, Vector3Int position)
+        public static void CreatePlant(Plant plant, Vector3Int position)
         {
-            ref var cell = ref GetCellReference(position.x, position.y);
-            if (cell.ContainsContent) return;
+            if (IsCellFree(position.x, position.y) == false) return;
             
-            if (cell.Type == CellType.Soil)
+            if (GetCellType(position.x, position.y) == CellType.Soil)
             {
                 var cropEntity = CreateEntity(new Entity()
                 {
@@ -58,86 +57,86 @@ namespace Simulation.Runtime.Entities
                     EntityType = EntityType.Resource
                 });
             
-                crop.Entity = cropEntity;
-                crop.GrowingTime = 0f;
-                crop.TimeSinceLastWatering = 0f;
-                crop.Stage = GrowStage.Seeds;
+                plant.Entity = cropEntity;
+                plant.GrowingTime = 0f;
+                plant.TimeSinceLastWatering = 0f;
+                plant.Stage = GrowStage.Seeds;
 
-                if (CropsCount == Crops.Length)
+                if (PlantsCount == Plants.Length)
                 {
-                    Array.Resize(ref Crops, CropsCount << 1);
+                    Array.Resize(ref Plants, PlantsCount << 1);
                 }
 
-                var index = CropsCount++;
-                Crops[index] = crop;
+                var index = PlantsCount++;
+                Plants[index] = plant;
 
-                FillCellContent(position.x, position.y, CellContent.Crops, cropEntity);
+                FillCellContent(position.x, position.y, CellContent.Plants, cropEntity);
 
                 _indexByEntity[cropEntity] = index;
-                InstantiateCellContentView(CellContent.Crops, cropEntity, crop.Type.ToString());
+                InstantiateCellContentView(CellContent.Plants, cropEntity, plant.Type.ToString());
             }
 
         }
         
-        public static void TickCrops(Crop[] crops, int cropsCount)
+        public static void TickPlants(Plant[] plants, int plantsCount)
         {
-            for (var i = 0; i < cropsCount; ++i)
+            for (var i = 0; i < plantsCount; ++i)
             {
-                if (crops[i].Stage == GrowStage.Faded)
+                if (plants[i].Stage == GrowStage.Faded)
                 {
                     continue;
                 }
                 
-                crops[i].GrowingTime += Time.deltaTime;
-                crops[i].TimeSinceLastWatering += Time.deltaTime;
+                plants[i].GrowingTime += Time.deltaTime;
+                plants[i].TimeSinceLastWatering += Time.deltaTime;
 
-                if (crops[i].TimeSinceLastWatering >= crops[i].TimeToDry)
+                if (plants[i].TimeSinceLastWatering >= plants[i].TimeToDry)
                 {
-                    crops[i].Stage = GrowStage.Faded;
-                    DrawCrop(ref crops[i]);
+                    plants[i].Stage = GrowStage.Faded;
+                    DrawPlant(ref plants[i]);
                     continue;
                 }
 
-                var growPercent = crops[i].GrowingTime / crops[i].TimeToGrow;
+                var growPercent = plants[i].GrowingTime / plants[i].TimeToGrow;
 
                 if (growPercent is > 0.25f and < 0.5f)
                 {
-                    crops[i].Stage = GrowStage.Shoots;
-                    DrawCrop(ref crops[i]);
+                    plants[i].Stage = GrowStage.Shoots;
+                    DrawPlant(ref plants[i]);
                 } else if (growPercent is > 0.5f and < 0.75f)
                 {
-                    crops[i].Stage = GrowStage.HalfGrown;
-                    DrawCrop(ref crops[i]);
+                    plants[i].Stage = GrowStage.HalfGrown;
+                    DrawPlant(ref plants[i]);
                 }else if (growPercent is > 0.75f and < 1f)
                 {
-                    crops[i].Stage = GrowStage.AlmostGrown;
-                    DrawCrop(ref crops[i]);
+                    plants[i].Stage = GrowStage.AlmostGrown;
+                    DrawPlant(ref plants[i]);
                 }else if (growPercent >= 1f)
                 {
-                    crops[i].Stage = GrowStage.FullyGrown;
-                    DrawCrop(ref crops[i]);
+                    plants[i].Stage = GrowStage.FullyGrown;
+                    DrawPlant(ref plants[i]);
                 }
             }
         }
 
-        public static void DestroyCrop(int index)
+        public static void DestroyPlant(int index)
         {
-            var entity = Crops[index].Entity;
+            var entity = Plants[index].Entity;
             var position = EntityManager.Entities[entity].Position;
 
 
-            Crops[index] = Crops[--CropsCount];
-            Crops[CropsCount] = default;
+            Plants[index] = Plants[--PlantsCount];
+            Plants[PlantsCount] = default;
             RemoveCellContent((int)position.x, (int)position.y);
             DeleteEntity(entity);
-            FreeCrop(entity);
+            ReleasePlant(entity);
         }
 
-        public static ref Crop GetCropByEntity(int entity)
+        public static ref Plant GetPlantByEntity(int entity)
         {
-            return ref Crops[_indexByEntity[entity]];
+            return ref Plants[_indexByEntity[entity]];
         }
 
-        public static int GetCropIdByEntity(int entity) => _indexByEntity[entity];
+        public static int GetPlantIdByEntity(int entity) => _indexByEntity[entity];
     }
 }

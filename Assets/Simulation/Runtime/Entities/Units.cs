@@ -21,12 +21,14 @@ namespace Simulation.Runtime.Entities
         
         public static int CreateFarmer(Farmer farmer, Vector3 position)
         {
-            var entity = CreateEntity();
+            var entity = CreateEntity(new Entity
+            {
+                Position = position,
+                Orientation = -1f,
+                Flags = EntityFlags.Tickable,
+                EntityType = EntityType.Unit
+            });
             farmer.Entity = entity;
-            EntityManager.Entities[entity].Position = position;
-            EntityManager.Entities[entity].Orientation = -1f;
-            EntityManager.Entities[entity].Flags = EntityFlags.Tickable;
-            EntityManager.Entities[entity].EntityType = EntityType.Unit;
             
             if (FarmersCount == Farmers.Length)
             {

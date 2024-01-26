@@ -71,9 +71,12 @@ namespace Simulation.Runtime.Entities
 
         public static int CreateResourceDeposit(ResourceDeposit deposit, Vector3Int position)
         {
-            var entity = CreateEntity();
-
-            EntityManager.Entities[entity].Position = position;
+            var entity = CreateEntity(new Entity
+            {
+                Position = position,
+                Flags = EntityFlags.Static,
+                EntityType = EntityType.Resource
+            });
 
             deposit.Entity = entity;
 
@@ -111,7 +114,7 @@ namespace Simulation.Runtime.Entities
             Resources[ResourcesCount] = default;
             RemoveCellContent((int)position.x, (int)position.y);
             DeleteEntity(entity);
-            FreeView(entity);
+            ReleaseView(entity);
         }
 
         public static ref ResourceDeposit GetResourceByEntity(int entity)

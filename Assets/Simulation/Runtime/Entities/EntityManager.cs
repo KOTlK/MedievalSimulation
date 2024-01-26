@@ -1,5 +1,4 @@
 ﻿using System;
-using Simulation.Runtime.View;
 using UnityEngine;
 
 namespace Simulation.Runtime.Entities
@@ -35,7 +34,6 @@ namespace Simulation.Runtime.Entities
                 id = EntitiesCount++;
             }
 
-            Entities[id] = default;
             Entities[id].Id = id;
             Entities[id].IsAlive = true;
             
@@ -50,19 +48,23 @@ namespace Simulation.Runtime.Entities
             Entities[id].Flags = config.Flags;
             Entities[id].EntityType = config.EntityType;
 
+            Debug.Log($"Entity Created: {Entities[id].EntityType.ToString("F")}, {Entities[id].Id.ToString()}");
             return id;
         }
 
         public static void DeleteEntity(int id)
         {
+            Debug.Log($"Removing Entity: {Entities[id].EntityType.ToString("F")}, {Entities[id].Id.ToString()}");
+            Entities[id] = default;
             Entities[id].IsAlive = false;
             Entities[id].Id = -1;
-            EntitiesCount--;
             if (_freeEntitiesCount == _freeEntities.Length)
             {
                 Array.Resize(ref _freeEntities, _freeEntitiesCount << 1);
             }
+
             _freeEntities[_freeEntitiesCount++] = id;
+            EntitiesCount--;
         }
     }
 }

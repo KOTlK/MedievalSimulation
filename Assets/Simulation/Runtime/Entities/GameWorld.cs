@@ -29,7 +29,7 @@ namespace Simulation.Runtime.Entities
 
     public enum CellContent
     {
-        Crops,
+        Plants,
         ResourceDeposit
     }
     
@@ -61,9 +61,14 @@ namespace Simulation.Runtime.Entities
             {
                 for (var x = 0; x < size.x; ++x)
                 {
-                    var entity = CreateEntity();
                     var position = new Vector3(x * CellSize.x, y * CellSize.y, 0);
                     var cellType = genFunc(x, y);
+                    var entity = CreateEntity(new Entity
+                    {
+                        Position = position,
+                        EntityType = EntityType.GroundCell,
+                        Flags = EntityFlags.Static
+                    });
 
                     var cell = new Cell()
                     {
@@ -88,9 +93,6 @@ namespace Simulation.Runtime.Entities
                     }
 
                     SetCell(x, y, cell);
-                    EntityManager.Entities[entity].Position = position;
-                    EntityManager.Entities[entity].Flags = EntityFlags.Static;
-                    EntityManager.Entities[entity].EntityType = EntityType.GroundCell;
                 }
             }
 
@@ -140,5 +142,8 @@ namespace Simulation.Runtime.Entities
 
         public static ref Cell GetCellByEntity(int entity) => ref Cells[_indexByEntity[entity]];
         public static int GetCellIdByEntity(int entity) => _indexByEntity[entity];
+
+        public static bool IsCellFree(int x, int y) => Cells[x + y * Size.x].ContainsContent == false;
+        public static CellType GetCellType(int x, int y) => Cells[x + y * Size.x].Type;
     }
 }

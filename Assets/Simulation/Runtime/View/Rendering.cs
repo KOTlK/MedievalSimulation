@@ -9,7 +9,7 @@ namespace Simulation.Runtime.View
     public static class Rendering
     {
         private static EntityView[] _viewsDense = new EntityView[100];
-        private static CropView[] _cropsDense = new CropView[100];
+        private static PlantView[] _cropsDense = new PlantView[100];
 
         private static GameObject _worldParent;
 
@@ -40,7 +40,7 @@ namespace Simulation.Runtime.View
             AddView(entity, Object.Instantiate(resource, position, Quaternion.identity));
         }
 
-        public static void FreeView(int entity)
+        public static void ReleaseView(int entity)
         {
             if (_viewsDense[entity])
             {
@@ -68,11 +68,11 @@ namespace Simulation.Runtime.View
             }
         }
 
-        public static void DrawCrop(ref Crop crop)
+        public static void DrawPlant(ref Plant plant)
         {
-            var view = _cropsDense[crop.Entity];
+            var view = _cropsDense[plant.Entity];
 
-            view.SwitchStage(crop.Stage);
+            view.SwitchStage(plant.Stage);
         }
 
         public static void InstantiateCellContentView(CellContent content, int entity, string name)
@@ -95,9 +95,9 @@ namespace Simulation.Runtime.View
                     AddView(entity, view);
                     break;
                 }
-                case CellContent.Crops:
+                case CellContent.Plants:
                 {
-                    var resource = Resources.Load<CropView>(path);
+                    var resource = Resources.Load<PlantView>(path);
                     var view = Object.Instantiate(resource, EntityManager.Entities[entity].Position,
                         Quaternion.identity);
 
@@ -115,10 +115,10 @@ namespace Simulation.Runtime.View
             }
         }
 
-        public static void FreeCrop(int entity)
+        public static void ReleasePlant(int entity)
         {
             _cropsDense[entity] = null;
-            FreeView(entity);
+            ReleaseView(entity);
         }
     }
 }
