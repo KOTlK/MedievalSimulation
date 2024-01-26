@@ -52,14 +52,14 @@ namespace Simulation.Runtime.Entities
             ref var cell = ref GetCellReference((int)position.x, (int)position.y);
             if (cell.ContainsContent) return;
             
-            
             if (cell.Type == CellType.Soil)
             {
                 var cropEntity = CreateEntity(new Entity()
                 {
                     Position = position,
                     Orientation = 0f,
-                    Flags = EntityFlags.Tickable
+                    Flags = EntityFlags.Tickable,
+                    EntityType = EntityType.Resource
                 });
             
                 crop.Entity = cropEntity;

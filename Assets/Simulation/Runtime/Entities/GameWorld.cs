@@ -86,7 +86,8 @@ namespace Simulation.Runtime.Entities
 
                     SetCell(x, y, cell);
                     EntityManager.Entities[entity].Position = position;
-                    EntityManager.Entities[entity].Flags = EntityFlags.WorldCell;
+                    EntityManager.Entities[entity].Flags = EntityFlags.Static;
+                    EntityManager.Entities[entity].EntityType = EntityType.GroundCell;
                 }
             }
 

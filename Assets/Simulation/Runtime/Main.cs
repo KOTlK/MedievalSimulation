@@ -6,6 +6,7 @@ using static Simulation.Runtime.Entities.GameWorld;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Farming;
 using static Simulation.Runtime.Entities.Mining;
+using static Simulation.Runtime.Entities.Units;
 
 namespace Simulation.Runtime
 {
@@ -26,7 +27,7 @@ namespace Simulation.Runtime
         private void Update()
         {
             TickCrops(Crops, CropsCount);
-            DrawFarmers(EntityManager.Farmers, EntityManager.FarmersCount);
+            DrawFarmers(Farmers, FarmersCount);
 
             if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
@@ -49,7 +50,7 @@ namespace Simulation.Runtime
         {
             for (var i = 0; i < count; ++i)
             {
-                EntityManager.CreateFarmer(
+                CreateFarmer(
                     new Farmer() 
                     { 
                         Sex = Random.Range(0, 2) == 0

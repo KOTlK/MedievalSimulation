@@ -33,7 +33,7 @@ namespace Simulation.Runtime.View
             }
         }
 
-        public static void CreateFarmer(int entity, bool male, Vector3 position)
+        public static void InstantiateFarmer(int entity, bool male, Vector3 position)
         {
             var resource = Resources.Load<EntityView>(male ? "Prefabs/Units/FarmerMale" : "Prefabs/Units/FarmerFemale");
 

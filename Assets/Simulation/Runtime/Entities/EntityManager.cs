@@ -7,9 +7,7 @@ namespace Simulation.Runtime.Entities
     public static class EntityManager
     {
         public static Entity[] Entities = new Entity[100];
-        public static Farmer[] Farmers = new Farmer[100];
         public static int      EntitiesCount;
-        public static int      FarmersCount;
 
         private static int[]   _freeEntities = new int[100];
         private static int     _freeEntitiesCount;
@@ -63,40 +61,6 @@ namespace Simulation.Runtime.Entities
             }
             _freeEntities[_freeEntitiesCount++] = id;
             Rendering.DestroyView(id);
-        }
-
-        public static int CreateFarmer(Farmer farmer, Vector3 position)
-        {
-            var entity = CreateEntity();
-            farmer.Entity = entity;
-            Entities[entity].Position = position;
-            Entities[entity].Orientation = -1f;
-            Entities[entity].Flags = EntityFlags.Tickable | EntityFlags.Farmer;
-            farmer.Index = FarmersCount++;
-
-            if (farmer.Index == Farmers.Length)
-            {
-                Array.Resize(ref Farmers, farmer.Index << 1);
-            }
-            
-            Farmers[farmer.Index] = farmer;
-
-            Rendering.CreateFarmer(entity, farmer.Sex, position);
-
-            return farmer.Index;
-        }
-
-        public static void DeleteFarmer(int id)
-        {
-            if (id >= FarmersCount)
-            {
-                Debug.LogError("Index can't be more than or equals FarmersCount");
-            }
-
-            DeleteEntity(Farmers[id].Entity);
-            Farmers[id] = Farmers[--FarmersCount];
-            Farmers[id].Index = id;
-            Farmers[FarmersCount] = default;
         }
     }
 }
