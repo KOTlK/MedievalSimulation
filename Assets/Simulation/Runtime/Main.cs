@@ -1,5 +1,7 @@
 using System;
 using Simulation.Runtime.Entities;
+using Simulation.Runtime.TimeManagement;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -16,17 +18,48 @@ namespace Simulation.Runtime
     {
         public int FarmersCount;
         public Vector2Int WorldSize;
+        public float DayLength = 5f;
+        public float TimeSpeedMultiplier = 1f;
+        public TMP_Text DateText;
+        public TMP_Text SeasonText;
+
+        private float _timePassed;
         
         private void Start()
         {
             FillMap();
             SpawnFarmers(FarmersCount);
             PlayerInput.Input.EnableGameplayScheme();
+            Clock.SetStartDate();
+            DateText.text = Clock.CurrentDate.ToString();
+            SeasonText.text = Clock.CurrentSeason.ToString();
         }
 
         private void Update()
         {
             TickPlants(Plants, PlantsCount);
+            
+            //date test
+            _timePassed += Time.deltaTime * TimeSpeedMultiplier;
+
+            if (_timePassed >= DayLength)
+            {
+                Clock.IncreaseDaysCount();
+                DateText.text = Clock.CurrentDate.ToString();
+                SeasonText.text = Clock.CurrentSeason.ToString();
+                _timePassed = 0;
+            }
+
+            if (Keyboard.current.spaceKey.isPressed)
+            {
+                TimeSpeedMultiplier = 10f;
+            }
+
+
+            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
+            {
+                TimeSpeedMultiplier = 1f;
+            }
             
 
             if (Mouse.current.leftButton.wasReleasedThisFrame)
