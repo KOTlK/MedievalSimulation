@@ -13,6 +13,11 @@ namespace Simulation.Runtime.Entities
         /// </summary>
         public bool Sex;
     }
+
+    public enum UnitType
+    {
+        Farmer
+    }
     
     public static class Units
     {

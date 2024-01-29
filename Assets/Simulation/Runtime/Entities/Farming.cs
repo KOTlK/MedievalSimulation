@@ -49,7 +49,7 @@ namespace Simulation.Runtime.Entities
             
             if (GetCellType(position.x, position.y) == CellType.Soil)
             {
-                var cropEntity = CreateEntity(new Entity()
+                var plantEntity = CreateEntity(new Entity()
                 {
                     Position = position,
                     Orientation = 0f,
@@ -57,7 +57,7 @@ namespace Simulation.Runtime.Entities
                     EntityType = EntityType.Resource
                 });
             
-                plant.Entity = cropEntity;
+                plant.Entity = plantEntity;
                 plant.GrowingTime = 0f;
                 plant.TimeSinceLastWatering = 0f;
                 plant.Stage = GrowStage.Seeds;
@@ -70,10 +70,10 @@ namespace Simulation.Runtime.Entities
                 var index = PlantsCount++;
                 Plants[index] = plant;
 
-                FillCellContent(position.x, position.y, CellContent.Plants, cropEntity);
+                FillCellContent(position.x, position.y, CellContent.Plants, plantEntity);
 
-                _indexByEntity[cropEntity] = index;
-                InstantiateCellContentView(CellContent.Plants, cropEntity, plant.Type.ToString());
+                _indexByEntity[plantEntity] = index;
+                InstantiateCellContentView(CellContent.Plants, plantEntity, plant.Type.ToString());
             }
 
         }
@@ -124,12 +124,12 @@ namespace Simulation.Runtime.Entities
             var entity = Plants[index].Entity;
             var position = EntityManager.Entities[entity].Position;
 
-
             Plants[index] = Plants[--PlantsCount];
             Plants[PlantsCount] = default;
             RemoveCellContent((int)position.x, (int)position.y);
             DeleteEntity(entity);
             ReleasePlant(entity);
+            _indexByEntity[Plants[index].Entity] = index;
         }
 
         public static ref Plant GetPlantByEntity(int entity)

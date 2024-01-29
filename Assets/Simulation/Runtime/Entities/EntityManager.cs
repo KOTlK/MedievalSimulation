@@ -6,10 +6,11 @@ namespace Simulation.Runtime.Entities
     public static class EntityManager
     {
         public static Entity[] Entities = new Entity[100];
-        public static int      EntitiesCount;
+        public static int      MaxEntityIndex = 0;
+        public static int      EntitiesCount = 0;
 
         private static int[]   _freeEntities = new int[100];
-        private static int     _freeEntitiesCount;
+        private static int     _freeEntitiesCount = 0;
         
         public static bool IsAlive(int entity)
         {
@@ -26,16 +27,18 @@ namespace Simulation.Runtime.Entities
             }
             else
             {
-                if (EntitiesCount == Entities.Length)
+                if (MaxEntityIndex == Entities.Length)
                 {
-                    Array.Resize(ref Entities, EntitiesCount << 1);
+                    Array.Resize(ref Entities, MaxEntityIndex << 1);
                 }
                 
-                id = EntitiesCount++;
+                id = MaxEntityIndex++;
             }
 
             Entities[id].Id = id;
             Entities[id].IsAlive = true;
+
+            EntitiesCount++;
             
             return id;
         }

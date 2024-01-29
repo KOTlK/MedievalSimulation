@@ -115,6 +115,7 @@ namespace Simulation.Runtime.Entities
             RemoveCellContent((int)position.x, (int)position.y);
             DeleteEntity(entity);
             ReleaseView(entity);
+            _indexByEntity[Resources[index].Entity] = index;
         }
 
         public static ref ResourceDeposit GetResourceByEntity(int entity)

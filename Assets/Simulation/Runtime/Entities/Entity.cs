@@ -11,11 +11,11 @@ namespace Simulation.Runtime.Entities
     }
 
     [Flags]
-    public enum EntityType : ulong
+    public enum EntityType
     {
-        GroundCell      = 1 << 0,
-        Unit            = 1 << 1,
-        Resource        = 1 << 2,
+        GroundCell,
+        Unit,
+        Resource,
     }
     
     

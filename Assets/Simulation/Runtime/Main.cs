@@ -8,6 +8,7 @@ using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Farming;
 using static Simulation.Runtime.Entities.Mining;
 using static Simulation.Runtime.Entities.Units;
+using static Simulation.Runtime.Entities.EntityManager;
 
 namespace Simulation.Runtime
 {
@@ -52,7 +53,6 @@ namespace Simulation.Runtime
 
                 ref var cell = ref GetCellReference(cellPosition.x, cellPosition.y);
 
-                Debug.Log($"({cellPosition.x.ToString()}, {cellPosition.y.ToString()}), {cell.ContainsContent.ToString()}, {cell.Content.ToString()}, {cell.ContentEntity.ToString()}");
                 if (cell.ContainsContent)
                 {
                     switch (cell.Content)
