@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.GameWorld;
+using static Simulation.Runtime.Vars;
 
 namespace Simulation.Runtime.Entities
 {
@@ -32,8 +33,7 @@ namespace Simulation.Runtime.Entities
     {
         public static ResourceDeposit[] Resources = new ResourceDeposit[10];
         public static int ResourcesCount = 0;
-        public static int MinResourcesCount = 200;
-        public static int MaxResourcesCount = 10000;
+        
         
         private static Dictionary<int, int> _indexByEntity = new();
         

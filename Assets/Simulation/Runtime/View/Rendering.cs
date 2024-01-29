@@ -3,6 +3,7 @@ using Simulation.Runtime.Entities;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using static Simulation.Runtime.View.SpriteCatalog;
+using static Simulation.Runtime.Vars;
 
 namespace Simulation.Runtime.View
 {
@@ -52,9 +53,9 @@ namespace Simulation.Runtime.View
         public static void DrawWorldFirst()
         {
             _worldParent = new GameObject();
-            for (var y = 0; y < GameWorld.Size.y; ++y)
+            for (var y = 0; y < WorldSize.y; ++y)
             {
-                for (var x = 0; x < GameWorld.Size.x; ++x)
+                for (var x = 0; x < WorldSize.x; ++x)
                 {
                     var go = new GameObject();
                     var view = go.AddComponent<CellView>();

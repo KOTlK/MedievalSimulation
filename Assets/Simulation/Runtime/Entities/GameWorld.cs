@@ -4,6 +4,7 @@ using UnityEngine;
 using static Simulation.Runtime.Entities.EntityManager;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Mining;
+using static Simulation.Runtime.Vars;
 using Random = UnityEngine.Random;
 
 namespace Simulation.Runtime.Entities
@@ -43,25 +44,21 @@ namespace Simulation.Runtime.Entities
 
     public static class GameWorld
     {
-        public static Vector2Int Size;
         public static Cell[] Cells;
         public static WorldBounds Bounds;
-        public static Vector2 CellSize = new (1f, 1f);
-        public static int WorldSeed = 87645;
-        public static float ResourceDepositChance = 0.02f;
 
         private static Dictionary<int, int> _indexByEntity = new();
 
         public static void CreateWorld(Vector2Int size, WorldGeneration genFunc )
         {
-            Size = size;
+            WorldSize = size;
             Cells = new Cell[size.x * size.y];
 
             for (var y = 0; y < size.y; ++y)
             {
                 for (var x = 0; x < size.x; ++x)
                 {
-                    var position = new Vector3(x * CellSize.x, y * CellSize.y, 0);
+                    var position = new Vector3(x * LocalCellSize.x, y * LocalCellSize.y, 0);
                     var cellType = genFunc(x, y);
                     var entity = CreateEntity(new Entity
                     {
@@ -98,8 +95,8 @@ namespace Simulation.Runtime.Entities
 
             Bounds = new WorldBounds()
             {
-                Max = new Vector2(size.x - 1 + CellSize.x / 2f, size.y - 1 + CellSize.y / 2f),
-                Min = new Vector2(0 - CellSize.x / 2f, 0 - CellSize.y / 2f)
+                Max = new Vector2(size.x - 1 + LocalCellSize.x / 2f, size.y - 1 + LocalCellSize.y / 2f),
+                Min = new Vector2(0 - LocalCellSize.x / 2f, 0 - LocalCellSize.y / 2f)
             };
         }
 
@@ -119,31 +116,31 @@ namespace Simulation.Runtime.Entities
 
         public static void FillCellContent(int x, int y, CellContent content, int contentEntity)
         {
-            Cells[x + y * Size.x].Content = content;
-            Cells[x + y * Size.x].ContainsContent = true;
-            Cells[x + y * Size.x].ContentEntity = contentEntity;
+            Cells[x + y * WorldSize.x].Content = content;
+            Cells[x + y * WorldSize.x].ContainsContent = true;
+            Cells[x + y * WorldSize.x].ContentEntity = contentEntity;
         }
 
         public static void RemoveCellContent(int x, int y)
         {
-            Cells[x + y * Size.x].ContainsContent = false;
-            Cells[x + y * Size.x].ContentEntity = -1;
+            Cells[x + y * WorldSize.x].ContainsContent = false;
+            Cells[x + y * WorldSize.x].ContentEntity = -1;
         }
 
-        public static Cell GetCell(int x, int y) => Cells[x + y * Size.x];
-        public static ref Cell GetCellReference(int x, int y) => ref Cells[x + y * Size.x];
+        public static Cell GetCell(int x, int y) => Cells[x + y * WorldSize.x];
+        public static ref Cell GetCellReference(int x, int y) => ref Cells[x + y * WorldSize.x];
         public static void SetCell(int x, int y, Cell cell)
         {
-            var index = x + y * Size.x;
+            var index = x + y * WorldSize.x;
 
             _indexByEntity[cell.Entity] = index;
-            Cells[x + y * Size.x] = cell;
+            Cells[x + y * WorldSize.x] = cell;
         }
 
         public static ref Cell GetCellByEntity(int entity) => ref Cells[_indexByEntity[entity]];
         public static int GetCellIdByEntity(int entity) => _indexByEntity[entity];
 
-        public static bool IsCellFree(int x, int y) => Cells[x + y * Size.x].ContainsContent == false;
-        public static CellType GetCellType(int x, int y) => Cells[x + y * Size.x].Type;
+        public static bool IsCellFree(int x, int y) => Cells[x + y * WorldSize.x].ContainsContent == false;
+        public static CellType GetCellType(int x, int y) => Cells[x + y * WorldSize.x].Type;
     }
 }
