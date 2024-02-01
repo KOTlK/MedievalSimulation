@@ -1,5 +1,6 @@
 ﻿using System;
 using Simulation.Runtime.Entities;
+using Simulation.Runtime.Game;
 using UnityEngine;
 using static Simulation.Runtime.PlayerInput.Input;
 
@@ -52,8 +53,8 @@ namespace Simulation.Runtime.Camera
                 var maxCameraBound = _currentPosition + new Vector3(horizontal, vertical);
                 var minCameraBound = _currentPosition - new Vector3(horizontal, vertical);
 
-                var maxBounds = GameWorld.Bounds.Max;
-                var minBounds = GameWorld.Bounds.Min;
+                var maxBounds = GameUtils.CurrentState.WorldGrid.Bounds.Max;
+                var minBounds = GameUtils.CurrentState.WorldGrid.Bounds.Min;
 
                 if (maxCameraBound.x > maxBounds.x)
                 {

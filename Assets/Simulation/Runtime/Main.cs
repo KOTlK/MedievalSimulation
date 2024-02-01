@@ -1,16 +1,18 @@
 using System;
 using Simulation.Runtime.Entities;
+using Simulation.Runtime.Game;
 using Simulation.Runtime.TimeManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
-using static Simulation.Runtime.Entities.GameWorld;
+using static Simulation.Runtime.Entities.WorldUtils;
 using static Simulation.Runtime.View.Rendering;
 using static Simulation.Runtime.Entities.Farming;
 using static Simulation.Runtime.Entities.Mining;
 using static Simulation.Runtime.Entities.Units;
 using static Simulation.Runtime.Entities.EntityManager;
+using static Simulation.Runtime.Game.GameUtils;
 
 namespace Simulation.Runtime
 {
@@ -27,7 +29,9 @@ namespace Simulation.Runtime
         
         private void Start()
         {
-            FillMap();
+            CurrentState = new GameState();
+            CreateWorld(ref CurrentState, WorldSize, PerlinNoise);
+            DrawWorldFirst(ref CurrentState.WorldGrid);
             SpawnFarmers(FarmersCount);
             PlayerInput.Input.EnableGameplayScheme();
             Clock.SetStartDate();
@@ -37,7 +41,9 @@ namespace Simulation.Runtime
 
         private void Update()
         {
-            TickPlants(Plants, PlantsCount);
+            UpdateInput();
+            ExecuteLogic();
+            Render();
             
             //date test
             _timePassed += Time.deltaTime * TimeSpeedMultiplier;
@@ -62,7 +68,7 @@ namespace Simulation.Runtime
             }
             
 
-            if (Mouse.current.leftButton.wasReleasedThisFrame)
+            /*if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
                 var position = Mouse.current.position.ReadValue();
                 var worldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(position);
@@ -100,29 +106,23 @@ namespace Simulation.Runtime
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-            }
+            }*/
             
-            DrawFarmers(Farmers, FarmersCount);
+            
         }
 
         private void SpawnFarmers(int count)
         {
             for (var i = 0; i < count; ++i)
             {
-                CreateFarmer(
+                /*CreateFarmer(
                     new Farmer() 
                     { 
                         Sex = Random.Range(0, 2) == 0
                     }, 
                     
-                    Random.insideUnitCircle * 2f);
+                    Random.insideUnitCircle * 2f);*/
             }
-        }
-
-        private void FillMap()
-        {
-            CreateWorld(WorldSize, PerlinNoise);
-            DrawWorldFirst();
         }
     }
 }

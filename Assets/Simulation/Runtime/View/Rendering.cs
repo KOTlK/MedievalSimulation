@@ -50,7 +50,7 @@ namespace Simulation.Runtime.View
             }
         }
 
-        public static void DrawWorldFirst()
+        public static void DrawWorldFirst(ref WorldGrid grid)
         {
             _worldParent = new GameObject();
             for (var y = 0; y < WorldSize.y; ++y)
@@ -60,11 +60,11 @@ namespace Simulation.Runtime.View
                     var go = new GameObject();
                     var view = go.AddComponent<CellView>();
                     var spriteRenderer = go.AddComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = GetSprite(GameWorld.GetCell(x, y).Type.ToString());
-                    view.transform.position = GameWorld.GetCell(x, y).Position;
+                    ref var localGrid = ref WorldUtils.GetLocalGrid(ref grid, x, y);
+                    spriteRenderer.sprite = GetSprite(localGrid.CellType.ToString());
+                    view.transform.position = new Vector3(localGrid.WorldPosition.x, localGrid.WorldPosition.y, 0);
                     view.SpriteRenderer = spriteRenderer;
                     go.transform.SetParent(_worldParent.transform);
-                    AddView(GameWorld.GetCell(x, y).Entity, view);
                 }
             }
         }

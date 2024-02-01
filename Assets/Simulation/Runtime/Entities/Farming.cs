@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using static Simulation.Runtime.Entities.EntityManager;
-using static Simulation.Runtime.View.Rendering;
-using static Simulation.Runtime.Entities.GameWorld;
+using static Simulation.Runtime.Entities.WorldUtils;
 
 namespace Simulation.Runtime.Entities
 {
@@ -38,16 +37,13 @@ namespace Simulation.Runtime.Entities
     
     public static class Farming
     {
-        public static Plant[] Plants = new Plant[10];
-        public static int PlantsCount = 0;
-
         private static Dictionary<int, int> _indexByEntity = new();
         
-        public static void CreatePlant(Plant plant, Vector3Int position)
+        public static void CreatePlant(ref LocalGrid grid, Plant plant, Vector3Int position)
         {
-            if (IsCellFree(position.x, position.y) == false) return;
+            if (IsCellFree(ref grid, position.x, position.y) == false) return;
             
-            if (GetCellType(position.x, position.y) == CellType.Soil)
+            if (GetCellType(ref grid, position.x, position.y) == WorldCellType.Soil)
             {
                 var plantEntity = CreateEntity(new Entity()
                 {
@@ -62,18 +58,17 @@ namespace Simulation.Runtime.Entities
                 plant.TimeSinceLastWatering = 0f;
                 plant.Stage = GrowStage.Seeds;
 
-                if (PlantsCount == Plants.Length)
+                if (grid.PlantsCount == grid.Plants.Length)
                 {
-                    Array.Resize(ref Plants, PlantsCount << 1);
+                    Array.Resize(ref grid.Plants, grid.PlantsCount << 1);
                 }
 
-                var index = PlantsCount++;
-                Plants[index] = plant;
+                var index = grid.PlantsCount++;
+                grid.Plants[index] = plant;
 
-                FillCellContent(position.x, position.y, CellContent.Plants, plantEntity);
+                FillCellContent(ref grid, position, CellContent.Plants, plantEntity);
 
                 _indexByEntity[plantEntity] = index;
-                InstantiateCellContentView(CellContent.Plants, plantEntity, plant.Type.ToString());
             }
 
         }
@@ -93,7 +88,6 @@ namespace Simulation.Runtime.Entities
                 if (plants[i].TimeSinceLastWatering >= plants[i].TimeToDry)
                 {
                     plants[i].Stage = GrowStage.Faded;
-                    DrawPlant(ref plants[i]);
                     continue;
                 }
 
@@ -102,39 +96,29 @@ namespace Simulation.Runtime.Entities
                 if (growPercent is > 0.25f and < 0.5f)
                 {
                     plants[i].Stage = GrowStage.Shoots;
-                    DrawPlant(ref plants[i]);
                 } else if (growPercent is > 0.5f and < 0.75f)
                 {
                     plants[i].Stage = GrowStage.HalfGrown;
-                    DrawPlant(ref plants[i]);
                 }else if (growPercent is > 0.75f and < 1f)
                 {
                     plants[i].Stage = GrowStage.AlmostGrown;
-                    DrawPlant(ref plants[i]);
                 }else if (growPercent >= 1f)
                 {
                     plants[i].Stage = GrowStage.FullyGrown;
-                    DrawPlant(ref plants[i]);
                 }
             }
         }
 
-        public static void DestroyPlant(int index)
+        public static void DestroyPlant(ref LocalGrid grid, int index)
         {
-            var entity = Plants[index].Entity;
+            var entity = grid.Plants[index].Entity;
             var position = EntityManager.Entities[entity].Position;
 
-            Plants[index] = Plants[--PlantsCount];
-            Plants[PlantsCount] = default;
-            RemoveCellContent((int)position.x, (int)position.y);
+            grid.Plants[index] = grid.Plants[--grid.PlantsCount];
+            grid.Plants[grid.PlantsCount] = default;
+            RemoveCellContent(ref grid, new Vector3Int((int)position.x, (int)position.y));
             DeleteEntity(entity);
-            ReleasePlant(entity);
-            _indexByEntity[Plants[index].Entity] = index;
-        }
-
-        public static ref Plant GetPlantByEntity(int entity)
-        {
-            return ref Plants[_indexByEntity[entity]];
+            _indexByEntity[grid.Plants[index].Entity] = index;
         }
 
         public static int GetPlantIdByEntity(int entity) => _indexByEntity[entity];

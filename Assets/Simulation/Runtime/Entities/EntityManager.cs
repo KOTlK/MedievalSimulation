@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Simulation.Runtime.Entities
 {
@@ -51,13 +50,11 @@ namespace Simulation.Runtime.Entities
             Entities[id].Flags = config.Flags;
             Entities[id].EntityType = config.EntityType;
 
-            Debug.Log($"Entity Created: {Entities[id].EntityType.ToString("F")}, {Entities[id].Id.ToString()}");
             return id;
         }
 
         public static void DeleteEntity(int id)
         {
-            Debug.Log($"Removing Entity: {Entities[id].EntityType.ToString("F")}, {Entities[id].Id.ToString()}");
             Entities[id] = default;
             Entities[id].IsAlive = false;
             Entities[id].Id = -1;

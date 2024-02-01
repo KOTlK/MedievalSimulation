@@ -21,10 +21,7 @@ namespace Simulation.Runtime.Entities
     
     public static class Units
     {
-        public static Farmer[] Farmers = new Farmer[10];
-        public static int FarmersCount = 0;
-        
-        public static int CreateFarmer(Farmer farmer, Vector3 position)
+        public static int CreateFarmer(ref LocalGrid grid, Farmer farmer, Vector3 position)
         {
             var entity = CreateEntity(new Entity
             {
@@ -35,28 +32,28 @@ namespace Simulation.Runtime.Entities
             });
             farmer.Entity = entity;
             
-            if (FarmersCount == Farmers.Length)
+            if (grid.FarmersCount == grid.Farmers.Length)
             {
-                Array.Resize(ref Farmers, FarmersCount << 1);
+                Array.Resize(ref grid.Farmers, grid.FarmersCount << 1);
             }
             
-            Farmers[FarmersCount++] = farmer;
+            grid.Farmers[grid.FarmersCount++] = farmer;
 
             InstantiateFarmer(entity, farmer.Sex, position);
 
             return entity;
         }
 
-        public static void DeleteFarmer(int id)
+        public static void DeleteFarmer(ref LocalGrid grid, int id)
         {
-            if (id >= FarmersCount)
+            if (id >= grid.FarmersCount)
             {
                 Debug.LogError("Index can't be more than or equals FarmersCount");
             }
 
-            DeleteEntity(Farmers[id].Entity);
-            Farmers[id] = Farmers[--FarmersCount];
-            Farmers[FarmersCount] = default;
+            DeleteEntity(grid.Farmers[id].Entity);
+            grid.Farmers[id] = grid.Farmers[--grid.FarmersCount];
+            grid.Farmers[grid.FarmersCount] = default;
         }
     }
 }

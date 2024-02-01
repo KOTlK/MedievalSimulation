@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static Simulation.Runtime.Entities.EntityManager;
-using static Simulation.Runtime.View.Rendering;
-using static Simulation.Runtime.Entities.GameWorld;
+using static Simulation.Runtime.Entities.WorldUtils;
 using static Simulation.Runtime.Vars;
 
 namespace Simulation.Runtime.Entities
@@ -31,10 +30,6 @@ namespace Simulation.Runtime.Entities
     
     public static class Mining
     {
-        public static ResourceDeposit[] Resources = new ResourceDeposit[10];
-        public static int ResourcesCount = 0;
-        
-        
         private static Dictionary<int, int> _indexByEntity = new();
         
         //Higher chance goes lower
@@ -69,7 +64,7 @@ namespace Simulation.Runtime.Entities
             return deposit;
         }
 
-        public static int CreateResourceDeposit(ResourceDeposit deposit, Vector3Int position)
+        public static int CreateResourceDeposit(ref LocalGrid grid, ResourceDeposit deposit, Vector3Int position)
         {
             var entity = CreateEntity(new Entity
             {
@@ -80,47 +75,43 @@ namespace Simulation.Runtime.Entities
 
             deposit.Entity = entity;
 
-            if (ResourcesCount == Resources.Length)
+            if (grid.ResourcesCount == grid.Resources.Length)
             {
-                Array.Resize(ref Resources, ResourcesCount << 1);
+                Array.Resize(ref grid.Resources, grid.ResourcesCount << 1);
             }
 
-            var index = ResourcesCount++;
-            Resources[index] = deposit;
-            InstantiateCellContentView(CellContent.ResourceDeposit, entity, deposit.Type.ToString());
+            var index = grid.ResourcesCount++;
+            grid.Resources[index] = deposit;
 
-            FillCellContent(position.x, position.y, CellContent.ResourceDeposit, entity);
+            FillCellContent(ref grid, position, CellContent.ResourceDeposit, entity);
 
             _indexByEntity[entity] = index;
             
             return entity;
         }
 
-        public static int CreateRandomResourceDeposit(Vector3Int position)
+        public static int CreateRandomResourceDeposit(ref LocalGrid localGrid, Vector3Int position)
         {
-            return CreateResourceDeposit(new ResourceDeposit()
-            {
-                Type = GetRandomDepositType(),
-                ResourcesLeft = Random.Range(MinResourcesCount, MaxResourcesCount)
-            }, position);
+            return CreateResourceDeposit(
+                ref localGrid,
+                new ResourceDeposit
+                {
+                    Type = GetRandomDepositType(),
+                    ResourcesLeft = Random.Range(MinResourcesCount, MaxResourcesCount)
+                }, position
+            );
         }
 
-        public static void DestroyResourceDeposit(int index)
+        public static void DestroyResourceDeposit(ref LocalGrid grid, int index)
         {
-            var entity = Resources[index].Entity;
+            var entity = grid.Resources[index].Entity;
             var position = EntityManager.Entities[entity].Position;
 
-            Resources[index] = Resources[--ResourcesCount];
-            Resources[ResourcesCount] = default;
-            RemoveCellContent((int)position.x, (int)position.y);
+            grid.Resources[index] = grid.Resources[--grid.ResourcesCount];
+            grid.Resources[grid.ResourcesCount] = default;
+            RemoveCellContent(ref grid, new Vector3Int((int)position.x, (int)position.y));
             DeleteEntity(entity);
-            ReleaseView(entity);
-            _indexByEntity[Resources[index].Entity] = index;
-        }
-
-        public static ref ResourceDeposit GetResourceByEntity(int entity)
-        {
-            return ref Resources[_indexByEntity[entity]];
+            _indexByEntity[grid.Resources[index].Entity] = index;
         }
         
         public static int GetResourceIdByEntity(int entity) => _indexByEntity[entity];

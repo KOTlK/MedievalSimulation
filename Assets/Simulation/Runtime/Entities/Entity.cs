@@ -13,7 +13,6 @@ namespace Simulation.Runtime.Entities
     [Flags]
     public enum EntityType
     {
-        GroundCell,
         Unit,
         Resource,
     }
@@ -22,6 +21,9 @@ namespace Simulation.Runtime.Entities
     public struct Entity
     {
         public Vector3     Position;
+        public int         ZHeight;
+        public int         GridId;
+        public int         PositionInHashGrid;
         public EntityFlags Flags;
         public EntityType  EntityType;
         public int         Id;
